@@ -1,0 +1,321 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Stack 2 of 2 — S3 Bucket, CloudFront Distribution, and GitHub Actions
+  IAM Role for the static website.
+  Depends on Stack 1 (cloudformation-certificate.yaml) being fully deployed
+  and validated first. The ACM Certificate ARN is imported automatically via
+  the CertStackName parameter — no manual ARN copy required.
+  DNS records (CNAME/ALIAS for apex and www) must be created manually in
+  your external DNS provider using the CloudFrontDomainName output.
+
+##############################################################
+# Parameters
+##############################################################
+Parameters:
+  DomainName:
+    Type: String
+    Description: Root domain name (e.g. example.com)
+    AllowedPattern: '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
+    ConstraintDescription: Must be a valid domain name.
+
+  CertStackName:
+    Type: String
+    Description: >
+      Exact name of the deployed Stack 1 certificate stack
+      (e.g. my-website-cert). The CertificateArn export is imported automatically.
+    Default: my-website-cert
+
+  GitHubOrg:
+    Type: String
+    Description: GitHub organisation or username (e.g. my-org)
+
+  GitHubRepo:
+    Type: String
+    Description: GitHub repository name (e.g. my-website)
+
+  GitHubBranch:
+    Type: String
+    Default: main
+    Description: Branch that is allowed to assume the deploy role
+
+  DefaultRootObject:
+    Type: String
+    Default: index.html
+    Description: CloudFront default root object
+
+  PriceClass:
+    Type: String
+    Default: PriceClass_100
+    AllowedValues:
+      - PriceClass_100
+      - PriceClass_200
+      - PriceClass_All
+    Description: CloudFront price class (100 = US/EU/Canada only)
+
+  CreateOidcProvider:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: >
+      Set to true to create the GitHub Actions OIDC provider in this account.
+      Set to false (default) if it already exists — only one can exist per AWS account.
+
+##############################################################
+# Metadata
+##############################################################
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label: { default: "Domain" }
+        Parameters: [DomainName]
+      - Label: { default: "Certificate Stack (Stack 1)" }
+        Parameters: [CertStackName]
+      - Label: { default: "GitHub OIDC" }
+        Parameters: [GitHubOrg, GitHubRepo, GitHubBranch, CreateOidcProvider]
+      - Label: { default: "CloudFront" }
+        Parameters: [DefaultRootObject, PriceClass]
+
+##############################################################
+# Conditions
+##############################################################
+Conditions:
+  ShouldCreateOidcProvider: !Equals [!Ref CreateOidcProvider, 'true']
+
+##############################################################
+# Resources
+##############################################################
+Resources:
+
+  # ── S3 Bucket (private — CloudFront OAC only) ──────────────
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "s3-${DomainName}-prd"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      WebsiteConfiguration:
+        IndexDocument: !Ref DefaultRootObject
+        ErrorDocument: !Ref DefaultRootObject   # SPA fallback — change to error.html for non-SPA sites
+      Tags:
+        - Key: Name
+          Value: !Sub "S3-${DomainName}-PRD"
+        - Key: Client
+          Value: !Sub "${DomainName}"          
+
+  # ── CloudFront Origin Access Control ───────────────────────
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "CF-OAC-${DomainName}-PRD"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # ── S3 Bucket Policy (allows CloudFront OAC only) ──────────
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${WebsiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub
+                  - "arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistId}"
+                  - DistId: !Ref CloudFrontDistribution
+
+  # ── CloudFront Distribution ─────────────────────────────────
+  # CertificateArn is imported directly from Stack 1 via Fn::ImportValue.
+  # CloudFormation will refuse to deploy this stack if Stack 1 does not
+  # exist or its export is not present, enforcing the dependency.
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Comment: !Sub "Static website for ${DomainName}"
+        Aliases:
+          - !Ref DomainName
+          - !Sub "www.${DomainName}"
+        DefaultRootObject: !Ref DefaultRootObject
+        PriceClass: !Ref PriceClass
+
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig: {}   # required (empty) when using OAC
+
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized (AWS managed)
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # CORS-S3Origin (AWS managed)
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03 # SecurityHeadersPolicy (AWS managed)
+          Compress: true
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD, OPTIONS]
+
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html   # SPA fallback — remove for non-SPA sites
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+
+        ViewerCertificate:
+          # Imported from Stack 1 — stack deploy will fail fast if Stack 1
+          # has not been deployed or its export is missing.
+          AcmCertificateArn: !ImportValue
+            Fn::Sub: "${CertStackName}-CertificateArn"
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+
+      Tags:
+        - Key: Name
+          Value: !Sub "CF-Distribution-${DomainName}-PRD"
+        - Key: Client
+          Value: !Sub "${DomainName}"          
+
+  # ── GitHub Actions OIDC Provider ────────────────────────────
+  # Only created when CreateOidcProvider=true. The GitHub OIDC provider
+  # is a singleton — only one can exist per AWS account. If it already
+  # exists (from another stack or manual creation) leave CreateOidcProvider
+  # set to false and the existing provider will be referenced by ARN below.
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: ShouldCreateOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  # ── IAM Role for GitHub Actions ─────────────────────────────
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "IAM-Role-GitHub-Actions-${DomainName}-PRD"
+      Description: Assumed by GitHub Actions via OIDC to deploy the static website
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: GitHubActionsOIDC
+            Effect: Allow
+            Principal:
+              Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - !Sub "repo:${GitHubOrg}/${GitHubRepo}:environment:*"
+                  - !Sub "repo:${GitHubOrg}/${GitHubRepo}:ref:refs/heads/${GitHubBranch}"
+      Policies:
+        - PolicyName: !Sub "IAM-Policy-GitHub-Actions-${DomainName}-PRD"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: S3SyncAccess
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt WebsiteBucket.Arn
+                  - !Sub "${WebsiteBucket.Arn}/*"
+              - Sid: CloudFrontInvalidation
+                Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                  - cloudfront:ListInvalidations
+                Resource:
+                  - !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+      Tags:
+        - Key: Name
+          Value: !Sub "IAM-Role-GitHub-Actions-${DomainName}-PRD"
+        - Key: Client
+          Value: !Sub "${DomainName}"          
+
+##############################################################
+# Outputs
+##############################################################
+Outputs:
+  WebsiteBucketName:
+    Description: S3 bucket name
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
+
+  WebsiteBucketArn:
+    Description: S3 bucket ARN
+    Value: !GetAtt WebsiteBucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketArn"
+
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub "${AWS::StackName}-DistributionId"
+
+  CloudFrontDomainName:
+    Description: >
+      CloudFront domain name — create CNAME records pointing example.com
+      and www.example.com to this value in your external DNS provider.
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-DistributionDomain"
+
+  GitHubActionsRoleArn:
+    Description: IAM Role ARN for GitHub Actions (add to GitHub Environment as AWS_ROLE_ARN)
+    Value: !GetAtt GitHubActionsRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-GitHubActionsRoleArn"
+
+  WebsiteUrl:
+    Description: Website URL
+    Value: !Sub "https://${DomainName}"
+
+  DnsInstructions:
+    Description: >
+      Action required — add these DNS records at your external provider
+      to point your domain at the CloudFront distribution.
+    Value: !Sub
+      - |
+        Record 1: CNAME  ${DomainName}      ->  ${CFDomain}
+        Record 2: CNAME  www.${DomainName}  ->  ${CFDomain}
+        Note: Some DNS providers require an ALIAS/ANAME record for the apex
+        domain (${DomainName}) instead of a CNAME.
+      - CFDomain: !GetAtt CloudFrontDistribution.DomainName

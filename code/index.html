@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Northern Trailers Inc – Trailers That Meet All Your Needs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0C4D9A',
+            accent:  '#ED1C24',
+          },
+          fontFamily: {
+            display:   ['"Bebas Neue"',       'sans-serif'],
+            condensed: ['"Barlow Condensed"', 'sans-serif'],
+            body:      ['Barlow',             'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Barlow', sans-serif; background: #0a0a0a; color: #f0f0f0; overflow-x: hidden; margin: 0; }
+
+    /* NAV */
+    #navbar { background: #000; box-shadow: 0 2px 20px rgba(12,77,154,0.35); }
+    .nav-link { position: relative; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; color: #d0d0d0; text-decoration: none; transition: color 0.2s; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #ED1C24; transition: width 0.3s; }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
+
+    /* HERO */
+    .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; background-size: cover; background-position: center; }
+    .hero-slide.active { opacity: 1; }
+    .slide-0 { background-image: linear-gradient(135deg,rgba(0,0,0,.72) 0%,rgba(12,77,154,.45) 100%), url('IMG/hero-sales.jpg'); }
+    .slide-1 { background-image: linear-gradient(135deg,rgba(0,0,0,.72) 0%,rgba(12,77,154,.45) 100%), url('IMG/hero-service.jpg'); }
+    .slide-2 { background-image: linear-gradient(135deg,rgba(0,0,0,.72) 0%,rgba(12,77,154,.40) 100%), url('IMG/hero-inspection.jpg'); }
+
+    .anim-up { animation: slideUp 0.7s ease forwards; opacity: 0; }
+    .d1 { animation-delay: 0.2s; } .d2 { animation-delay: 0.4s; } .d3 { animation-delay: 0.6s; } .d4 { animation-delay: 0.8s; }
+    @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+    /* BUTTONS */
+    .btn-red { display:inline-flex; align-items:center; gap:8px; background:#ED1C24; color:#fff; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; padding:.75rem 1.75rem; border-radius:4px; text-decoration:none; transition:background .2s,transform .2s,box-shadow .2s; }
+    .btn-red:hover { background:#c0141b; transform:translateY(-2px); box-shadow:0 6px 20px rgba(237,28,36,.45); }
+    .btn-ghost { display:inline-flex; align-items:center; gap:8px; background:transparent; color:#fff; border:2px solid rgba(255,255,255,.6); font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; padding:.73rem 1.75rem; border-radius:4px; text-decoration:none; transition:border-color .2s,background .2s; }
+    .btn-ghost:hover { border-color:#fff; background:rgba(255,255,255,.08); }
+
+    /* SECTION LABEL */
+    .lbl { font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:.18em; text-transform:uppercase; font-size:.78rem; color:#ED1C24; }
+    .ttl { font-family:'Bebas Neue',sans-serif; letter-spacing:.04em; }
+    .bar { display:inline-block; width:48px; height:4px; background:#ED1C24; border-radius:2px; }
+
+    /* CARDS */
+    .svc-card { border:1px solid rgba(255,255,255,.07); background:#111; transition:transform .3s,border-color .3s,box-shadow .3s; border-radius:8px; padding:1.75rem; }
+    .svc-card:hover { transform:translateY(-6px); border-color:#0C4D9A; box-shadow:0 12px 40px rgba(12,77,154,.3); }
+    .svc-icon { width:56px; height:56px; background:linear-gradient(135deg,#0C4D9A,#1a6ad4); border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem; }
+
+    .sal-card { position:relative; overflow:hidden; border-radius:8px; }
+    .sal-card img { width:100%; height:230px; object-fit:cover; display:block; transition:transform .4s; }
+    .sal-card:hover img { transform:scale(1.06); }
+    .sal-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.85) 30%,transparent); display:flex; align-items:flex-end; padding:1.25rem; }
+    .sal-badge { position:absolute; top:12px; right:12px; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:3px; color:#fff; }
+
+    .gal-item { border:1px dashed rgba(255,255,255,.12); border-radius:6px; background:#1a1a1a; aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; position:relative; transition:border-color .3s; }
+    .gal-item:hover { border-color:#0C4D9A; }
+
+    .chip { display:inline-block; background:rgba(12,77,154,.18); border:1px solid rgba(12,77,154,.4); color:#aac9f0; font-size:.8rem; padding:4px 10px; border-radius:20px; transition:background .2s,color .2s; }
+    .chip:hover { background:rgba(12,77,154,.45); color:#fff; }
+
+    .cta-card { background:#111; border:1px solid rgba(12,77,154,.35); border-radius:10px; transition:box-shadow .3s; text-decoration:none; display:flex; align-items:center; gap:1.5rem; padding:2rem; }
+    .cta-card:hover { box-shadow:0 8px 32px rgba(12,77,154,.3); }
+
+    footer { border-top:3px solid #ED1C24; }
+
+    #mobile-menu { display:none; }
+    #mobile-menu.open { display:block; }
+
+    /* REVEAL — default visible so nothing ever stays hidden */
+    .reveal { opacity:1; transform:none; transition:opacity .7s ease, transform .7s ease; }
+    .reveal.pre { opacity:0; transform:translateY(24px); }
+
+    @keyframes spinCW  { to { transform:rotate(360deg);  } }
+    @keyframes spinCCW { to { transform:rotate(-360deg); } }
+    .spin-cw  { animation:spinCW  20s linear infinite; }
+    .spin-ccw { animation:spinCCW 30s linear infinite; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ───────────────────────────────────────────── -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <a href="#home" style="text-decoration:none;" class="flex flex-col leading-none">
+        <span class="font-display text-white text-2xl lg:text-3xl tracking-wider">
+          NORTHERN TRAILERS <span style="color:#ED1C24">INC</span>
+        </span>
+        <span class="font-condensed text-xs tracking-[.2em] uppercase" style="color:#888">Trailers That Meet All Your Needs</span>
+      </a>
+
+      <div class="hidden lg:flex items-center gap-7">
+        <a href="#services"      class="nav-link">Services</a>
+        <a href="#sales"         class="nav-link">Sales</a>
+        <a href="#inspection"    class="nav-link">Inspection</a>
+        <a href="#gallery"       class="nav-link">Gallery</a>
+        <a href="#service-areas" class="nav-link">Areas</a>
+        <a href="#contact"       class="nav-link">Contact</a>
+        <a href="tel:4168546443" class="btn-red text-sm py-2 px-4">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+          416-854-6443
+        </a>
+      </div>
+
+      <button id="hbtn" class="lg:hidden p-2 flex flex-col gap-1.5" aria-label="Menu">
+        <span id="hb1" class="block w-6 h-0.5 bg-white transition-all duration-300"></span>
+        <span id="hb2" class="block w-6 h-0.5 bg-white transition-all duration-300"></span>
+        <span id="hb3" class="block w-4 h-0.5 bg-white transition-all duration-300"></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="lg:hidden bg-black border-t border-white/10 px-4 pb-6">
+    <div class="flex flex-col gap-4 pt-5">
+      <a href="#services"      class="nav-link text-lg py-1" onclick="closeMenu()">Services</a>
+      <a href="#sales"         class="nav-link text-lg py-1" onclick="closeMenu()">Sales</a>
+      <a href="#inspection"    class="nav-link text-lg py-1" onclick="closeMenu()">Inspection</a>
+      <a href="#gallery"       class="nav-link text-lg py-1" onclick="closeMenu()">Gallery</a>
+      <a href="#service-areas" class="nav-link text-lg py-1" onclick="closeMenu()">Service Areas</a>
+      <a href="#contact"       class="nav-link text-lg py-1" onclick="closeMenu()">Contact</a>
+      <a href="tel:4168546443" class="btn-red mt-2 justify-center">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        Call 416-854-6443
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section id="home" class="relative overflow-hidden" style="height:100vh;min-height:600px;">
+  <div class="hero-slide slide-0 active" id="hs0"></div>
+  <div class="hero-slide slide-1"        id="hs1"></div>
+  <div class="hero-slide slide-2"        id="hs2"></div>
+  <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom,rgba(0,0,0,.2),transparent 50%,rgba(0,0,0,.75))"></div>
+  <div class="relative z-10 h-full flex items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="max-w-3xl">
+        <div class="anim-up d1 mb-5">
+          <span id="hbadge" class="inline-block text-white font-condensed font-bold text-xs tracking-widest uppercase px-3 py-1.5 rounded" style="background:#ED1C24">SALES</span>
+        </div>
+        <h1 id="htitle" class="anim-up d2 font-display text-white leading-none mb-4" style="font-size:clamp(3rem,8vw,6.5rem);line-height:1">
+          QUALITY TRAILERS<br/>FOR EVERY JOB
+        </h1>
+        <p id="hdesc" class="anim-up d3 font-body text-gray-200 text-lg lg:text-xl mb-8 max-w-xl">
+          Trailers that meet all your needs. Sales, service, and Ontario-certified inspections.
+        </p>
+        <div class="anim-up d4 flex flex-wrap gap-4">
+          <a href="#sales"   class="btn-red">Browse Trailers</a>
+          <a href="#contact" class="btn-ghost">Get a Quote</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="absolute z-10 flex gap-3" style="bottom:2.5rem;left:50%;transform:translateX(-50%)">
+    <button class="sdot transition-all duration-400" data-i="0" style="width:32px;height:6px;border-radius:3px;background:#fff;border:none;cursor:pointer;padding:0"></button>
+    <button class="sdot transition-all duration-400" data-i="1" style="width:8px; height:6px;border-radius:3px;background:rgba(255,255,255,.4);border:none;cursor:pointer;padding:0"></button>
+    <button class="sdot transition-all duration-400" data-i="2" style="width:8px; height:6px;border-radius:3px;background:rgba(255,255,255,.4);border:none;cursor:pointer;padding:0"></button>
+  </div>
+</section>
+
+<!-- ── STATS ─────────────────────────────────────────────── -->
+<div style="background:#0C4D9A;padding:1.25rem 0;" class="reveal">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center text-white">
+      <div><div class="font-display text-4xl">20+</div><div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Years Experience</div></div>
+      <div><div class="font-display text-4xl">6</div>  <div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Service Types</div></div>
+      <div><div class="font-display text-4xl">100+</div><div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Service Areas</div></div>
+      <div><div class="font-display text-4xl">ON</div> <div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Certified Inspections</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SERVICES ──────────────────────────────────────────── -->
+<section id="services" style="padding:6rem 0;background:#0d0d0d;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <p class="lbl mb-2">What We Do</p>
+      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">OUR SERVICES</h2>
+      <div class="flex justify-center"><span class="bar"></span></div>
+      <p class="mt-5 font-body text-lg max-w-xl mx-auto" style="color:#9ca3af">Full-service trailer shop serving Ontario with expert repairs, maintenance, and certification.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">FULL SERVICE</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Complete trailer maintenance and repair services. We keep your trailer in peak operating condition year-round.</p>
+      </div>
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">ANNUAL INSPECTIONS</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Stay compliant and road-ready. Our certified technicians perform thorough annual safety inspections.</p>
+      </div>
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">BRAKES</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Brake inspection, repair and replacement for all trailer types. Safety is our top priority on every job.</p>
+      </div>
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">SUSPENSION</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Leaf spring replacement, axle alignment, and full suspension rebuilds to restore ride quality and load capacity.</p>
+      </div>
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">ELECTRICAL</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Wiring harness repair, lighting, brake controllers, and full electrical diagnostics for all trailer makes.</p>
+      </div>
+
+      <div class="svc-card reveal">
+        <div class="svc-icon"><svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3 class="font-condensed font-bold text-white text-2xl mb-2 tracking-wide">WELDING</h3>
+        <p class="font-body text-sm leading-relaxed" style="color:#9ca3af">Structural welding and fabrication. Frame repairs, custom modifications, and heavy-duty specialty builds.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── SALES ─────────────────────────────────────────────── -->
+<section id="sales" style="padding:6rem 0;background:#000;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <p class="lbl mb-2">Inventory</p>
+      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">TRAILER INVENTORY</h2>
+      <div class="flex justify-center"><span class="bar"></span></div>
+      <p class="mt-5 font-body text-lg max-w-xl mx-auto" style="color:#9ca3af">Trailers ready to go and custom orders built to your exact needs.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <div class="sal-card reveal">
+        <img src="IMG/dump-trailer.png" alt="Dump Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">DUMP TRAILERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Heavy-duty hydraulic dump trailers for landscaping, construction and hauling.</p></div></div>
+        <span class="sal-badge" style="background:#ED1C24">In Stock</span>
+      </div>
+
+      <div class="sal-card reveal">
+        <img src="IMG/float-trailer.png" alt="Float Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">FLOAT TRAILERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Equipment floats built to transport heavy machinery safely and reliably.</p></div></div>
+        <span class="sal-badge" style="background:#ED1C24">In Stock</span>
+      </div>
+
+      <div class="sal-card reveal">
+        <img src="IMG/utility-trailer.png" alt="Utility Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">UTILITY TRAILERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Versatile open utility trailers for everyday hauling needs.</p></div></div>
+        <span class="sal-badge" style="background:#ED1C24">In Stock</span>
+      </div>
+
+      <div class="sal-card reveal">
+        <img src="IMG/landscaping-trailer.png" alt="Landscaping Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">LANDSCAPING TRAILERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Purpose-built for lawn care crews with ramps, racks and secure tie-downs.</p></div></div>
+        <span class="sal-badge" style="background:#ED1C24">In Stock</span>
+      </div>
+
+      <div class="sal-card reveal">
+        <img src="IMG/car-trailer.png" alt="Car Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">CAR TRAILERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Single and tandem axle car haulers for vehicles of all sizes.</p></div></div>
+        <span class="sal-badge" style="background:#ED1C24">In Stock</span>
+      </div>
+
+      <div class="sal-card reveal">
+        <img src="IMG/custom-trailer.png" alt="Custom Trailer" loading="lazy"/>
+        <div class="sal-overlay"><div><h3 class="font-condensed font-bold text-white text-2xl tracking-wide">CUSTOM ORDERS</h3><p style="color:#d1d5db;font-size:.875rem;margin-top:.25rem">Don't see what you need? We build custom trailers to your exact specifications.</p></div></div>
+        <span class="sal-badge" style="background:#0C4D9A">Custom</span>
+      </div>
+
+    </div>
+    <div class="text-center mt-10 reveal">
+      <a href="#contact" class="btn-red" style="font-size:1rem;padding:.875rem 2rem">
+        Request a Quote
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSPECTION ─────────────────────────────────────────── -->
+<section id="inspection" style="padding:6rem 0;background:#0d0d0d;position:relative;overflow:hidden;">
+  <div style="position:absolute;right:-8rem;top:0;width:24rem;height:24rem;border-radius:50%;background:radial-gradient(circle,#0C4D9A,transparent);opacity:.05;pointer-events:none"></div>
+  <div style="position:absolute;left:-8rem;bottom:0;width:24rem;height:24rem;border-radius:50%;background:radial-gradient(circle,#ED1C24,transparent);opacity:.05;pointer-events:none"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="position:relative;z-index:1">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <div class="reveal">
+        <p class="lbl mb-2">Certified</p>
+        <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">ONTARIO<br/>INSPECTIONS</h2>
+        <div class="bar mb-6" style="display:block;margin-bottom:1.5rem"></div>
+        <p class="font-body text-lg leading-relaxed mb-6" style="color:#d1d5db">We are a Ministry of Transportation approved facility offering official <strong style="color:#fff">Yellow Sticker Safety Inspections</strong> for trailers in Ontario. Get your trailer certified and road-legal — fast and hassle-free.</p>
+        <ul style="list-style:none;padding:0;margin:0 0 2rem;display:flex;flex-direction:column;gap:.75rem">
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Ministry of Transportation approved station</span></li>
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Official Ontario Yellow Safety Sticker issued on-site</span></li>
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Experienced certified inspection technicians</span></li>
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Repairs done on-site if needed to pass inspection</span></li>
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Quick turnaround — book your appointment today</span></li>
+        </ul>
+        <a href="#contact" class="btn-red">Book an Inspection</a>
+      </div>
+
+      <div style="display:flex;justify-content:center" class="reveal">
+        <div style="position:relative;width:70%;height:70%px;display:flex;align-items:center;justify-content:center;">
+          <img src="IMG/yellow-sticker.png" alt="Inspection" loading="lazy"/>
+          <div style="position:absolute;top:-10px;left:-58px;background:#0C4D9A;border-radius:8px;padding:8px 14px;z-index:3;">
+            <div class="font-display text-white text-2xl">MTO</div>
+            <div class="font-condensed tracking-wider uppercase" style="font-size:.65rem;color:#bfdbfe">Approved</div>
+          </div>
+          <div style="position:absolute;bottom:-10px;right:-56px;background:#ED1C24;border-radius:8px;padding:8px 14px;z-index:3;">
+            <div class="font-display text-white text-2xl">ON</div>
+            <div class="font-condensed tracking-wider uppercase" style="font-size:.65rem;color:#fecaca">Licensed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GALLERY ────────────────────────────────────────────── -->
+<section id="gallery" style="padding:6rem 0;background:#000;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <p class="lbl mb-2">Our Work</p>
+      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">GALLERY</h2>
+      <div class="flex justify-center"><span class="bar"></span></div>
+      <p class="mt-5 font-body text-lg" style="color:#9ca3af">Photos of our work coming soon. Contact us to see our full portfolio.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="gallery-grid"></div>
+    <p class="text-center mt-8 font-body text-sm" style="color:#6b7280">
+      Ready to see our work? <a href="#contact" style="color:#ED1C24">Contact us</a> for a full portfolio.
+    </p>
+  </div>
+</section>
+
+<!-- ── SERVICE AREAS ─────────────────────────────────────── -->
+<section id="service-areas" style="padding:6rem 0;background:#0d0d0d;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <p class="lbl mb-2">Where We Go</p>
+      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">SERVICE AREAS</h2>
+      <div class="flex justify-center"><span class="bar"></span></div>
+      <p class="mt-5 font-body text-lg max-w-2xl mx-auto" style="color:#9ca3af">We proudly serve communities across Ontario. Don't see your city? <a href="#contact" style="color:#ED1C24">Contact us</a> — we may still be able to help.</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center">
+      <span class="chip">Alcona</span><span class="chip">Allandale</span><span class="chip">Alliston</span><span class="chip">Amherstburg</span><span class="chip">Angus</span><span class="chip">Ardagh Bluffs</span><span class="chip">Aylmer</span><span class="chip">Barrie</span><span class="chip">Bayshore</span><span class="chip">Beeton</span><span class="chip">Blue Mountains</span><span class="chip">Bobcaygeon</span><span class="chip">Bradford West Gwillimbury</span><span class="chip">Brantford</span><span class="chip">Brighton</span><span class="chip">Cambridge</span><span class="chip">Campbellford</span><span class="chip">Cayuga</span><span class="chip">Chatham-Kent</span><span class="chip">Chesley</span><span class="chip">Coboconk</span><span class="chip">Cobourg</span><span class="chip">Colborne</span><span class="chip">Coldwater</span><span class="chip">Collingwood</span><span class="chip">Concord</span><span class="chip">Craighurst</span><span class="chip">Dalston</span><span class="chip">Delhi</span><span class="chip">Dundalk</span><span class="chip">Dunnville</span><span class="chip">Durham</span><span class="chip">Edgar</span><span class="chip">Elmvale</span><span class="chip">Essex</span><span class="chip">Exeter</span><span class="chip">Fenelon Falls</span><span class="chip">Flesherton</span><span class="chip">Goderich</span><span class="chip">Grand Bend</span><span class="chip">Guelph</span><span class="chip">Guthrie</span><span class="chip">Hanover</span><span class="chip">Hastings</span><span class="chip">Hawkestone</span><span class="chip">Holly</span><span class="chip">Horseshoe Valley</span><span class="chip">Ingersoll</span><span class="chip">Innisfil</span><span class="chip">Jarratt</span><span class="chip">Kawartha Lakes</span><span class="chip">Kincardine</span><span class="chip">Kingsville</span><span class="chip">Kirkfield</span><span class="chip">Kitchener</span><span class="chip">Kleinburg</span><span class="chip">Lakeshore</span><span class="chip">Leamington</span><span class="chip">Letitia Heights</span><span class="chip">Lindsay</span><span class="chip">Lion's Head</span><span class="chip">Listowel</span><span class="chip">London</span><span class="chip">Lucknow</span><span class="chip">Maple</span><span class="chip">Markdale</span><span class="chip">Markham</span><span class="chip">Meaford</span><span class="chip">Midland</span><span class="chip">Midhurst</span><span class="chip">Mitchell</span><span class="chip">Moonstone</span><span class="chip">New Tecumseth</span><span class="chip">Omemee</span><span class="chip">Orillia</span><span class="chip">Oro-Medonte</span><span class="chip">Oro Station</span><span class="chip">Owen Sound</span><span class="chip">Painswick</span><span class="chip">Paisley</span><span class="chip">Paris</span><span class="chip">Penetanguishene</span><span class="chip">Peterborough</span><span class="chip">Port Dover</span><span class="chip">Port Elgin</span><span class="chip">Port Hope</span><span class="chip">Port Stanley</span><span class="chip">Prices Corners</span><span class="chip">Sauble Beach</span><span class="chip">Saugeen Shores</span><span class="chip">Sarnia</span><span class="chip">Shanty Bay</span><span class="chip">Simcoe</span><span class="chip">Southampton</span><span class="chip">St. Marys</span><span class="chip">St. Thomas</span><span class="chip">Stratford</span><span class="chip">Strathroy</span><span class="chip">Sugarbush</span><span class="chip">Tecumseh</span><span class="chip">Teeswater</span><span class="chip">Thornbury</span><span class="chip">Thornhill</span><span class="chip">Tilbury</span><span class="chip">Tillsonburg</span><span class="chip">Tobermory</span><span class="chip">Tottenham</span><span class="chip">Trent Hills</span><span class="chip">Vaughan</span><span class="chip">Walkerton</span><span class="chip">Wallaceburg</span><span class="chip">Warminster</span><span class="chip">Warkworth</span><span class="chip">Waterloo</span><span class="chip">Wasaga Beach</span><span class="chip">Wiarton</span><span class="chip">Windsor</span><span class="chip">Woodbridge</span><span class="chip">Woodstock</span><span class="chip">Woodville</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ────────────────────────────────────────────── -->
+<section id="contact" style="padding:6rem 0;background:#000;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 reveal">
+      <p class="lbl mb-2">Get In Touch</p>
+      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">CONTACT US</h2>
+      <div class="flex justify-center"><span class="bar"></span></div>
+      <p class="mt-5 font-body text-lg" style="color:#9ca3af">Ready to talk trailers? Reach out — we're happy to help.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <a href="tel:4168546443" class="cta-card reveal">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(12,77,154,.2);border:1px solid rgba(12,77,154,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="24" height="24" fill="none" stroke="#0C4D9A" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        </div>
+        <div>
+          <p class="lbl mb-1">Call Us</p>
+          <p class="font-condensed font-bold text-white text-2xl tracking-wide">416-854-6443</p>
+          <p class="font-body text-sm mt-1" style="color:#6b7280">Mon–Fri, Business Hours</p>
+        </div>
+      </a>
+
+      <a href="mailto:info@northerntrailersinc.com" class="cta-card reveal">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(237,28,36,.1);border:1px solid rgba(237,28,36,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="24" height="24" fill="none" stroke="#ED1C24" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <p class="lbl mb-1" style="color:#ED1C24">Email Us</p>
+          <p class="font-condensed font-bold text-white text-lg tracking-wide" style="word-break:break-all">info@northerntrailersinc.com</p>
+          <p class="font-body text-sm mt-1" style="color:#6b7280">We reply within 24 hours</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="mt-14 rounded-lg overflow-hidden reveal" style="background:linear-gradient(135deg,#0C4D9A,#083a75);">
+      <div class="p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="font-display text-white" style="font-size:clamp(1.75rem,3vw,2.25rem)">READY TO GET STARTED?</h3>
+          <p class="font-body" style="color:#bfdbfe">Call or email us today for sales, service, or inspections.</p>
+        </div>
+        <a href="tel:4168546443" class="btn-red" style="white-space:nowrap">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+          Call Now
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer style="background:#000;padding:3rem 0;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-3 gap-10 mb-10">
+
+      <div>
+        <div style="margin-bottom:.75rem">
+          <span class="font-display text-white text-2xl tracking-wider">NORTHERN TRAILERS <span style="color:#ED1C24">INC</span></span>
+        </div>
+        <p class="font-body text-sm leading-relaxed mb-4" style="color:#6b7280">Trailers that meet all your needs. Sales, service, and Ontario-certified inspections across Southern and Central Ontario.</p>
+        <a href="tel:4168546443" class="btn-red text-sm py-2 px-4">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+          416-854-6443
+        </a>
+      </div>
+
+      <div>
+        <h4 class="font-condensed font-bold text-white tracking-widest uppercase text-sm mb-4">Quick Links</h4>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;color:#6b7280">
+          <li><a href="#services"      style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Our Services</a></li>
+          <li><a href="#sales"         style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Trailers for Sale</a></li>
+          <li><a href="#inspection"    style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Ontario Inspections</a></li>
+          <li><a href="#gallery"       style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Gallery</a></li>
+          <li><a href="#service-areas" style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Service Areas</a></li>
+          <li><a href="#contact"       style="color:inherit;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#6b7280'">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-condensed font-bold text-white tracking-widest uppercase text-sm mb-4">Contact Info</h4>
+        <div style="display:flex;flex-direction:column;gap:.75rem;font-size:.875rem;color:#6b7280">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <svg width="14" height="14" fill="none" stroke="#0C4D9A" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+            <a href="tel:4168546443" style="color:inherit;text-decoration:none">416-854-6443</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <svg width="14" height="14" fill="none" stroke="#ED1C24" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:info@northerntrailersinc.com" style="color:inherit;text-decoration:none;word-break:break-all">info@northerntrailersinc.com</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <svg width="14" height="14" fill="none" stroke="#555" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Mon &ndash; Fri: Business Hours</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;color:#4b5563;font-size:.75rem">
+      <span>&copy; 2024 Northern Trailers Inc. All rights reserved.</span>
+      <span>Serving Ontario &mdash; Trailers That Meet All Your Needs.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Mobile menu
+  var menuOpen = false;
+  var hb1 = document.getElementById('hb1');
+  var hb2 = document.getElementById('hb2');
+  var hb3 = document.getElementById('hb3');
+  document.getElementById('hbtn').addEventListener('click', function() {
+    menuOpen = !menuOpen;
+    document.getElementById('mobile-menu').classList.toggle('open', menuOpen);
+    if (menuOpen) { hb1.style.transform='translateY(7px) rotate(45deg)'; hb2.style.opacity='0'; hb3.style.transform='translateY(-7px) rotate(-45deg)'; hb3.style.width='24px'; }
+    else { hb1.style.transform=''; hb2.style.opacity=''; hb3.style.transform=''; hb3.style.width=''; }
+  });
+  function closeMenu() { menuOpen=false; document.getElementById('mobile-menu').classList.remove('open'); hb1.style.transform=''; hb2.style.opacity=''; hb3.style.transform=''; hb3.style.width=''; }
+
+  // ── Hero slider
+  var slideData = [
+    { badge:'SALES',       title:'QUALITY TRAILERS<br/>FOR EVERY JOB',   desc:'Dump, float, utility, landscaping, car, and custom trailers. Ready to work.' },
+    { badge:'SERVICE',     title:'EXPERT REPAIRS<br/>& MAINTENANCE',     desc:'Brakes, suspension, electrical, welding and full-service maintenance by certified techs.' },
+    { badge:'INSPECTIONS', title:'ONTARIO CERTIFIED<br/>YELLOW STICKER', desc:'MTO approved safety inspections. Stay legal and road-ready across Ontario.' },
+  ];
+  var cur = 0;
+  var slideEls = document.querySelectorAll('.hero-slide');
+  var dots     = document.querySelectorAll('.sdot');
+  var hbadge   = document.getElementById('hbadge');
+  var htitle   = document.getElementById('htitle');
+  var hdesc    = document.getElementById('hdesc');
+
+  function goSlide(n) {
+    slideEls[cur].classList.remove('active');
+    dots[cur].style.width = '8px'; dots[cur].style.opacity = '0.4';
+    cur = n;
+    slideEls[cur].classList.add('active');
+    dots[cur].style.width = '32px'; dots[cur].style.opacity = '1';
+    hbadge.textContent = slideData[n].badge;
+    htitle.innerHTML   = slideData[n].title;
+    hdesc.textContent  = slideData[n].desc;
+  }
+  dots.forEach(function(d,i){ d.addEventListener('click', function(){ goSlide(i); }); });
+  setInterval(function(){ goSlide((cur+1) % slideData.length); }, 5500);
+
+  // ── Gallery
+  var gg = document.getElementById('gallery-grid');
+  var photos = [
+    'gallery-1.jpg',
+    'gallery-2.jpg',
+    'gallery-3.jpg',
+    'gallery-4.jpg',
+    'gallery-5.jpg',
+    'gallery-6.jpg',
+    'gallery-7.jpg',
+    'gallery-8.jpg',
+    'gallery-9.jpg',
+    'gallery-10.jpg',
+    'gallery-11.jpg',
+    'gallery-12.jpg',
+    // add as many as you want
+  ];
+  photos.forEach(function(src) {
+    var d = document.createElement('div');
+    d.className = 'gal-item';
+    d.style.border = 'none';
+    d.innerHTML = '<img src="IMG/' + src + '" alt="Gallery photo" style="width:100%;height:100%;object-fit:cover;display:block;">';
+    gg.appendChild(d);
+  });
+
+  // ── Scroll reveal (safe: elements start visible, animate in when JS ready)
+  var revEls = document.querySelectorAll('.reveal');
+  revEls.forEach(function(el){ el.classList.add('pre'); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { e.target.classList.remove('pre'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    revEls.forEach(function(el){ io.observe(el); });
+  } else {
+    // Fallback: just show everything
+    revEls.forEach(function(el){ el.classList.remove('pre'); });
+  }
+</script>
+</body>
+</html>

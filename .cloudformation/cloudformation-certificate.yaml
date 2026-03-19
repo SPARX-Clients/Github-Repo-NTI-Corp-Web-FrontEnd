@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Stack 1 of 2 — ACM Certificate for the static website.
+  Uses DNS validation without Route 53 — after deploying, manually add
+  the two CNAME records shown in ACM to your DNS provider, then wait
+  for validation before deploying Stack 2 (cloudformation-infrastructure.yaml).
+
+##############################################################
+# Parameters
+##############################################################
+Parameters:
+  DomainName:
+    Type: String
+    Description: Root domain name (e.g. example.com)
+    AllowedPattern: '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
+    ConstraintDescription: Must be a valid domain name.
+
+##############################################################
+# Metadata
+##############################################################
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label: { default: "Domain" }
+        Parameters: [DomainName]
+
+##############################################################
+# Resources
+##############################################################
+Resources:
+
+  # ── ACM Certificate ─────────────────────────────────────────
+  # DNS validation is used so the certificate auto-renews without
+  # any manual steps each year. However, since DNS is managed
+  # outside of AWS, CloudFormation cannot add the validation
+  # records automatically.
+  #
+  # After this stack deploys (status: CREATE_IN_PROGRESS):
+  #   1. Open the AWS Console → Certificate Manager → this certificate
+  #   2. Expand the domain entries to reveal the two CNAME records
+  #      (one for example.com, one for www.example.com)
+  #   3. Add both CNAMEs to your external DNS provider
+  #   4. Wait for ACM to validate — typically 5–30 minutes
+  #   5. The stack will complete automatically once validated
+  #
+  # Alternatively, retrieve the CNAME records via CLI:
+  #   aws acm describe-certificate \
+  #     --certificate-arn <ARN from stack events> \
+  #     --region us-east-1 \
+  #     --query 'Certificate.DomainValidationOptions'
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub "www.${DomainName}"
+      ValidationMethod: DNS
+      Tags:
+        - Key: Name
+          Value: !Sub "ACM-Certificate-${DomainName}-PRD"
+        - Key: Client
+          Value: !Sub "${DomainName}"
+
+##############################################################
+# Outputs
+##############################################################
+Outputs:
+  CertificateArn:
+    Description: >
+      Validated ACM Certificate ARN — pass this value as the
+      CertificateArn parameter when deploying Stack 2.
+    Value: !Ref Certificate
+    Export:
+      Name: !Sub "${AWS::StackName}-CertificateArn"
