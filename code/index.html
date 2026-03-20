@@ -96,10 +96,17 @@
     .reveal { opacity:1; transform:none; transition:opacity .7s ease, transform .7s ease; }
     .reveal.pre { opacity:0; transform:translateY(24px); }
 
-    @keyframes spinCW  { to { transform:rotate(360deg);  } }
-    @keyframes spinCCW { to { transform:rotate(-360deg); } }
-    .spin-cw  { animation:spinCW  20s linear infinite; }
-    .spin-ccw { animation:spinCCW 30s linear infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+    .pulse-badge { animation: pulse 2s ease-in-out infinite; }
+
+    @keyframes breathe { 
+      0%,100% { transform: scale(1); } 
+      50%      { transform: scale(1.1); } 
+    }
+    .badge-breathe { 
+      animation: breathe 2s ease-in-out infinite; 
+      display: inline-block; 
+    }
   </style>
 </head>
 <body>
@@ -107,13 +114,18 @@
 <!-- ── NAVBAR ───────────────────────────────────────────── -->
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16 lg:h-20">
+    <div class="flex items-center justify-between h-16 sm:h-20 lg:h-28">
 
       <a href="#home" style="text-decoration:none;" class="flex flex-col leading-none">
-        <span class="font-display text-white text-2xl lg:text-3xl tracking-wider">
-          NORTHERN TRAILERS <span style="color:#ED1C24">INC</span>
-        </span>
-        <span class="font-condensed text-xs tracking-[.2em] uppercase" style="color:#888">Trailers That Meet All Your Needs</span>
+        <div style="display:inline-block; width:clamp(240px, 57vw, 480px);">
+          <div style="line-height:1; white-space:nowrap; width:100%; overflow:hidden;">
+            <span class="font-display" style="font-size:clamp(1.5rem, 7.5vw, 3rem); color:#ED1C24;-webkit-text-stroke:2px #fff;paint-order:stroke fill;letter-spacing:.08em;">NORTHERN</span>
+            <span class="font-display" style="font-size:clamp(1.5rem, 7.5vw, 3rem); color:#0C4D9A;-webkit-text-stroke:2px #fff;paint-order:stroke fill;letter-spacing:.08em;margin-left:.1rem;">TRAILERS</span>
+          </div>
+          <div style="width:100%; overflow:hidden; white-space:nowrap; font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#888; font-size:clamp(.7rem, 2.7vw, 1.12rem);">
+            Trailers That Meet All Your Needs
+          </div>
+        </div>
       </a>
 
       <div class="hidden lg:flex items-center gap-7">
@@ -123,8 +135,7 @@
         <a href="#gallery"       class="nav-link">Gallery</a>
         <a href="#service-areas" class="nav-link">Areas</a>
         <a href="#contact"       class="nav-link">Contact</a>
-        <a href="tel:4168546443" class="btn-red text-sm py-2 px-4">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        <a href="tel:4168546443" class="btn-red text-lg py-2 px-4">
           416-854-6443
         </a>
       </div>
@@ -189,7 +200,7 @@
 <div style="background:#0C4D9A;padding:1.25rem 0;" class="reveal">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center text-white">
-      <div><div class="font-display text-4xl">20+</div><div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Years Experience</div></div>
+      <div><div class="font-display text-4xl">40+</div><div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Years Experience</div></div>
       <div><div class="font-display text-4xl">6</div>  <div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Service Types</div></div>
       <div><div class="font-display text-4xl">100+</div><div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Service Areas</div></div>
       <div><div class="font-display text-4xl">ON</div> <div class="font-condensed text-sm tracking-widest uppercase" style="color:#bfdbfe">Certified Inspections</div></div>
@@ -202,7 +213,8 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-14 reveal">
       <p class="lbl mb-2">What We Do</p>
-      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">OUR SERVICES</h2>
+      <h2 class="ttl text-white mb-0" style="font-size:clamp(2.5rem,5vw,3.75rem)">OUR SERVICES</h2>
+      <div class="mb-6 pulse-badge badge-breathe" style="margin-top:.4rem; display:inline-block; background:#ED1C24; color:#fff; font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:clamp(1rem, 1.8vw, 0.8rem); letter-spacing:.2em; text-transform:uppercase; padding:.8em 1.2em; border-radius:3px;">Same Day Service</div>
       <div class="flex justify-center"><span class="bar"></span></div>
       <p class="mt-5 font-body text-lg max-w-xl mx-auto" style="color:#9ca3af">Full-service trailer shop serving Ontario with expert repairs, maintenance, and certification.</p>
     </div>
@@ -253,7 +265,8 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-14 reveal">
       <p class="lbl mb-2">Inventory</p>
-      <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">TRAILER INVENTORY</h2>
+      <h2 class="ttl text-white mb-0" style="font-size:clamp(2.5rem,5vw,3.75rem)">TRAILER INVENTORY</h2>
+      <div class="mb-6 pulse-badge badge-breathe" style="margin-top:.4rem; display:inline-block; background:#ED1C24; color:#fff; font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:clamp(1rem, 1.8vw, 0.8rem); letter-spacing:.2em; text-transform:uppercase; padding:.8em 1.2em; border-radius:3px;">Same Day Service</div>
       <div class="flex justify-center"><span class="bar"></span></div>
       <p class="mt-5 font-body text-lg max-w-xl mx-auto" style="color:#9ca3af">Trailers ready to go and custom orders built to your exact needs.</p>
     </div>
@@ -314,12 +327,13 @@
 
       <div class="reveal">
         <p class="lbl mb-2">Certified</p>
-        <h2 class="ttl text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">ONTARIO<br/>INSPECTIONS</h2>
+        <h2 class="ttl text-white mb-0" style="font-size:clamp(2.5rem,5vw,3.75rem)">ONTARIO INSPECTIONS</h2>
+        <div class="mb-6 pulse-badge badge-breathe" style="margin-top:.4rem; display:inline-block; background:#ED1C24; color:#fff; font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:clamp(1rem, 1.8vw, 0.8rem); letter-spacing:.2em; text-transform:uppercase; padding:.8em 1.2em; border-radius:3px;">Same Day Service</div>
         <div class="bar mb-6" style="display:block;margin-bottom:1.5rem"></div>
         <p class="font-body text-lg leading-relaxed mb-6" style="color:#d1d5db">We are a Ministry of Transportation approved facility offering official <strong style="color:#fff">Yellow Sticker Safety Inspections</strong> for trailers in Ontario. Get your trailer certified and road-legal — fast and hassle-free.</p>
         <ul style="list-style:none;padding:0;margin:0 0 2rem;display:flex;flex-direction:column;gap:.75rem">
           <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Ministry of Transportation approved station</span></li>
-          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Official Ontario Yellow Safety Sticker issued on-site</span></li>
+          <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Annual Yellow Stickers issued on-site</span></li>
           <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Experienced certified inspection technicians</span></li>
           <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Repairs done on-site if needed to pass inspection</span></li>
           <li style="display:flex;gap:.75rem;color:#d1d5db;align-items:flex-start"><svg style="margin-top:2px;flex-shrink:0;color:#ED1C24" width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg><span>Quick turnaround — book your appointment today</span></li>
@@ -354,9 +368,6 @@
       <p class="mt-5 font-body text-lg" style="color:#9ca3af">Photos of our work coming soon. Contact us to see our full portfolio.</p>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="gallery-grid"></div>
-    <p class="text-center mt-8 font-body text-sm" style="color:#6b7280">
-      Ready to see our work? <a href="#contact" style="color:#ED1C24">Contact us</a> for a full portfolio.
-    </p>
   </div>
 </section>
 
