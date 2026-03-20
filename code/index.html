@@ -531,28 +531,17 @@
 
   // ── Gallery
   var gg = document.getElementById('gallery-grid');
-  var photos = [
-    'gallery-1.jpg',
-    'gallery-2.jpg',
-    'gallery-3.jpg',
-    'gallery-4.jpg',
-    'gallery-5.jpg',
-    'gallery-6.jpg',
-    'gallery-7.jpg',
-    'gallery-8.jpg',
-    'gallery-9.jpg',
-    'gallery-10.jpg',
-    'gallery-11.jpg',
-    'gallery-12.jpg',
-    // add as many as you want
-  ];
-  photos.forEach(function(src) {
-    var d = document.createElement('div');
-    d.className = 'gal-item';
-    d.style.border = 'none';
-    d.innerHTML = '<img src="IMG/' + src + '" alt="Gallery photo" style="width:100%;height:100%;object-fit:cover;display:block;">';
-    gg.appendChild(d);
-  });
+  
+var min = 1;
+var max = 24;
+
+for (var i = min; i <= max; i++) {
+  var d = document.createElement('div');
+  d.className = 'gal-item';
+  d.style.border = 'none';
+  d.innerHTML = '<img src="IMG/gallery/' + i + '.png" alt="Gallery photo" style="width:100%;height:100%;object-fit:cover;display:block;">';
+  gg.appendChild(d);
+}
 
   // ── Scroll reveal (safe: elements start visible, animate in when JS ready)
   var revEls = document.querySelectorAll('.reveal');
